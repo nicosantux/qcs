@@ -7,7 +7,7 @@ Every change reaches `main` through a squash-merged PR.
 - `.github/workflows/pr-title.yml` checks the PR title against Conventional Commits, because it becomes the squash commit that release-please reads.
 - `.github/workflows/pull-request.yml` runs format, typecheck, lint, tests and the binary build.
 
-Dependabot opens monthly `chore(deps)` PRs for Bun packages and `ci` PRs for GitHub Actions. Retitle one to `fix(deps)` when the bumped dependency ships in the binary and should trigger a release.
+Dependabot opens monthly PRs for Bun packages, one `chore(deps)` for the production group and one `chore(deps-dev)` for the development group, plus `ci` PRs for GitHub Actions. Retitle the production group PR to `fix(deps)` so the bumped dependencies ship in a release.
 
 ## Releases
 
