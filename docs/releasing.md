@@ -23,7 +23,7 @@ Both release-please and the tap push use a `RELEASE_TOKEN` secret: a fine-graine
 ## Building locally
 
 ```sh
-bun install --os '*' --cpu '*'  # cross-compiling needs every platform package
-bun scripts/build.ts            # dist/<os>-<arch>/qcs for every target
-bun scripts/build.ts linux-x64  # or only the given targets
+bun install --os '*' --cpu '*' --libc '*'  # cross-compiling needs every platform package
+bun scripts/build.ts                       # dist/<os>-<arch>/qcs for every target
+bun scripts/build.ts linux-x64             # or only the given targets
 ```
