@@ -1,0 +1,8 @@
+bun.lock
+bun.lockb
+dist
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+.agents
+.dev-home
