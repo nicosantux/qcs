@@ -10,7 +10,7 @@ const repoRoot = join(import.meta.dir, '..')
 /**
  * Compiles standalone binaries to `<out-dir>/<os>-<arch>/qcs`.
  * Usage: bun scripts/build.ts [--out-dir dist] [target...]; builds every target by default.
- * Cross-compiling needs every platform package of @opentui/core, so install with `--os '*' --cpu '*'`.
+ * Cross-compiling needs every platform package of @opentui/core, so install with `--os '*' --cpu '*' --libc '*'`.
  */
 async function build(): Promise<number> {
   const { values, positionals } = parseArgs({
