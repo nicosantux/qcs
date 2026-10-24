@@ -1,0 +1,46 @@
+{
+  "name": "qcs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "qcs": "src/cli/main.ts"
+  },
+  "scripts": {
+    "start": "bun run src/cli/main.ts",
+    "dev": "bun run scripts/dev.ts",
+    "dev:reset": "bun run scripts/dev.ts reset",
+    "test": "bun test --parallel",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier . --check",
+    "format:fix": "prettier . --write",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@opentui/core": "0.6.6",
+    "@opentui/react": "0.6.6",
+    "react": "19.3.1",
+    "smol-toml": "1.9.1"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "21.2.2",
+    "@commitlint/config-conventional": "21.2.2",
+    "@eslint/js": "10.0.1",
+    "@types/bun": "1.4.4",
+    "@types/react": "19.3.0",
+    "@typescript/native": "npm:typescript@7.0.2",
+    "eslint": "9",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-check-file": "3.3.2",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-unicorn": "74.0.0",
+    "globals": "17.11.0",
+    "husky": "9.1.7",
+    "prettier": "3.9.6",
+    "typescript": "npm:@typescript/typescript6@6.0.2",
+    "typescript-eslint": "8.68.0"
+  }
+}
