@@ -6,3 +6,5 @@ pnpm-lock.yaml
 yarn.lock
 .agents
 .dev-home
+.release-please-manifest.json
+CHANGELOG.md
