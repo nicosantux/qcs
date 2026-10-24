@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "skills": {
+    "opentui": {
+      "source": "opentui.com",
+      "sourceUrl": "https://opentui.com",
+      "sourceType": "well-known",
+      "computedHash": "27586da0d0b0cf267c1178674e9340673f1da3103a2ff016706a18b255606927",
+      "wellKnownDigest": "sha256:734cdb412326523cd842259a83c02403db6e5b1bafb82c1afd4860ac14fab1cd"
+    }
+  }
+}
