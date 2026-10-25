@@ -89,8 +89,8 @@ function viewHelp(
   ]
 }
 
-/** Header and status line around the body. */
-const SHELL_ROWS = 2
+/** The header above the body. */
+const SHELL_ROWS = 1
 
 /** Width of the widest keybinding line in the help, so the art only joins it when both fit. */
 const HELP_WIDTH =
@@ -109,8 +109,6 @@ function loadKeybindings(core: Core): { bindings: Keybindings; error: string | n
     return { bindings: DEFAULT_KEYBINDINGS, error: (error as Error).message }
   }
 }
-
-type ApplyState = { kind: 'applying' } | { kind: 'applied' } | { kind: 'failed'; message: string }
 
 export interface AppProps {
   core: Core
@@ -148,15 +146,12 @@ export function App({ core, onQuit }: AppProps) {
   const [helpOpen, setHelpOpen] = useState(false)
   const [splashDismissed, setSplashDismissed] = useState(() => !showsSplash(core))
   const [capturing, setCapturing] = useState(false)
-  const [applyState, setApplyState] = useState<ApplyState>({ kind: 'applying' })
+  const [applyError, setApplyError] = useState<string | null>(null)
   const [, onConfigChange] = useReducer((version: number) => version + 1, 0)
   const [{ bindings, error: keybindingsError }] = useState(() => loadKeybindings(core))
 
   useEffect(() => {
-    core.apply().then(
-      () => setApplyState({ kind: 'applied' }),
-      (error: Error) => setApplyState({ kind: 'failed', message: error.message }),
-    )
+    core.apply().catch((error: Error) => setApplyError(error.message))
   }, [core])
 
   const { width, height } = useTerminalDimensions()
@@ -250,7 +245,7 @@ export function App({ core, onQuit }: AppProps) {
           {keybindingsError !== null && (
             <text fg={COLORS.error}>{`Error: ${keybindingsError} (using the default keys)`}</text>
           )}
-          <StatusLine state={applyState} />
+          {applyError !== null && <text fg={COLORS.error}>{`Error: ${applyError}`}</text>}
         </box>
       </box>
     </KeybindingsProvider>
@@ -303,11 +298,4 @@ function HelpOverlay({ bindings, view }: { bindings: Keybindings; view: (typeof 
       )}
     </box>
   )
-}
-
-function StatusLine({ state }: { state: ApplyState }) {
-  if (state.kind === 'applying') return <text fg={COLORS.muted}>Applying configuration...</text>
-  if (state.kind === 'failed') return <text fg={COLORS.error}>{`Error: ${state.message}`}</text>
-
-  return <text fg={COLORS.muted}>Applied configuration to git</text>
 }

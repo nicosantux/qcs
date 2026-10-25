@@ -230,9 +230,10 @@ describe('TUI shell', () => {
 
     const tui = await openTui()
 
-    await tui.waitForFrame((f) => f.includes('Applied'))
+    const email = () =>
+      Bun.spawnSync(['git', 'config', 'user.email'], { cwd: repo, env: t.env }).stdout.toString()
 
-    expect(t.git(repo, 'config', 'user.email')).toBe('nico@personal.dev')
+    await tui.waitFor(() => email().trim() === 'nico@personal.dev')
     await tui.dispose()
   })
 
