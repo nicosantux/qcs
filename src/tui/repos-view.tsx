@@ -791,19 +791,25 @@ export function ReposView({
                 ]}
               />
             }
+            rows={paneRows}
           />
         ),
       }
     }
 
     if (offer.length > 0) {
+      const shown = offer.slice(0, Math.max(paneRows - 3, 1))
+
       return {
         title: 'Suggested Scan Roots',
         body: (
           <>
-            {offer.map(({ path, displayPath }) => (
+            {shown.map(({ path, displayPath }) => (
               <Line key={path}>{displayPath}</Line>
             ))}
+            {offer.length > shown.length && (
+              <text fg={COLORS.muted}>{`...and ${offer.length - shown.length} more`}</text>
+            )}
             <NoticeLine notice={notice} />
             <Hints
               hints={[
@@ -906,7 +912,7 @@ export function ReposView({
     return null
   })()
 
-  const floating = importOffer === null && offer.length === 0 && POPUP_MODES.has(mode.kind)
+  const floating = importOffer !== null || offer.length > 0 || POPUP_MODES.has(mode.kind)
 
   const top = windowStart(index, paneRows, rows.length)
   const nameWidth = Math.max(0, ...rows.map((row) => (row.cells ? row.text.length : 0)))
