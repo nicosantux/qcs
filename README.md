@@ -4,6 +4,8 @@ A terminal tool to assign and inspect which git identity (author, SSH key and si
 
 Identities are applied through native git `includeIf` rules, so the right identity is used from any client (terminal, editor, lazygit) even when the app is not running.
 
+![qcs demo: importing identities from ~/.gitconfig, creating an Identity with its own SSH key, assigning it to a folder and checking it from the CLI](docs/demo.gif)
+
 ## Install
 
 ```sh

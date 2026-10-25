@@ -3,3 +3,4 @@ node_modules
 dist
 .dev-home
 .*.bun-build
+.DS_Store
