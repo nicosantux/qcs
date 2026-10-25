@@ -7,7 +7,7 @@ Every change reaches `main` through a squash-merged PR.
 - `.github/workflows/pr-title.yml` checks the PR title against Conventional Commits, because it becomes the squash commit that release-please reads.
 - `.github/workflows/pull-request.yml` runs format, typecheck, lint, tests and the binary build.
 
-Dependabot opens monthly `chore(deps)` PRs for Bun packages and `ci` PRs for GitHub Actions. Retitle one to `fix(deps)` when the bumped dependency ships in the binary and should trigger a release.
+Dependabot opens monthly PRs for Bun packages, one `chore(deps)` for the production group and one `chore(deps-dev)` for the development group, plus `ci` PRs for GitHub Actions. Retitle the production group PR to `fix(deps)` so the bumped dependencies ship in a release.
 
 ## Releases
 
@@ -23,7 +23,7 @@ Both release-please and the tap push use a `RELEASE_TOKEN` secret: a fine-graine
 ## Building locally
 
 ```sh
-bun install --os '*' --cpu '*'  # cross-compiling needs every platform package
-bun scripts/build.ts            # dist/<os>-<arch>/qcs for every target
-bun scripts/build.ts linux-x64  # or only the given targets
+bun install --os '*' --cpu '*' --libc '*'  # cross-compiling needs every platform package
+bun scripts/build.ts                       # dist/<os>-<arch>/qcs for every target
+bun scripts/build.ts linux-x64             # or only the given targets
 ```

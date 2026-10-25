@@ -1,6 +1,6 @@
 version: 2
 updates:
-  # Bun has no prefix-development, so every bump is chore(deps). Retitle a runtime bump to fix(deps) to ship it in a release.
+  # Every bun bump is chore(deps) or chore(deps-dev). Retitle the production group PR to fix(deps) to ship it in a release.
   - package-ecosystem: bun
     directory: /
     schedule:
@@ -8,6 +8,14 @@ updates:
     commit-message:
       prefix: chore
       include: scope
+    groups:
+      production:
+        dependency-type: production
+      development:
+        dependency-type: development
+    ignore:
+      - dependency-name: eslint
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
