@@ -10,8 +10,8 @@ import { BOLD, COLORS, SELECTED } from './theme.ts'
 /** Below this many columns the side pane is hidden and dialogs take the main pane. */
 const SIDE_PANE_MIN_WIDTH = 100
 
-/** Header, status line and the two pane borders. */
-const CHROME_ROWS = 4
+/** Header and the two pane borders. */
+const CHROME_ROWS = 3
 
 export interface Pane {
   body: ReactNode

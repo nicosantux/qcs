@@ -251,61 +251,63 @@ export function SettingsView({ core, onCapture, onConfigChange }: SettingsViewPr
     }
   })
 
-  const dialog: Pane | null =
+  const popup: Pane | null =
     mode.kind === 'confirm-import'
       ? {
           title: 'Import existing configuration',
           body: (
-            <ImportPreview plan={mode.plan} error={error} footer={<Confirm question='Import?' />} />
+            <ImportPreview
+              plan={mode.plan}
+              error={error}
+              footer={<Confirm question='Import?' />}
+              rows={paneRows}
+            />
           ),
         }
-      : null
-
-  const popup: Pane | null =
-    mode.kind === 'form'
-      ? {
-          title: 'New Scan Root',
-          body: (
-            <>
-              <box flexDirection='row'>
-                <text fg={COLORS.muted}>{'Path '}</text>
-                <Input
-                  focused
-                  value={mode.path}
-                  onInput={(path) => setMode({ kind: 'form', path })}
-                  onSubmit={() =>
-                    void run(core.addScanRoot(mode.path), `Added Scan Root ${mode.path}`)
-                  }
-                />
-              </box>
-              {completions.paths.map((path, index) => (
-                <ListRow key={path} selected={index === completions.selected}>
-                  {path}
-                </ListRow>
-              ))}
-              <Hints
-                hints={[
-                  ['Tab', 'complete'],
-                  ['↑/↓', 'choose'],
-                  ['Enter', 'save'],
-                  ['Esc', 'cancel'],
-                ]}
-              />
-            </>
-          ),
-        }
-      : mode.kind === 'confirm-delete'
+      : mode.kind === 'form'
         ? {
-            title: 'Remove Scan Root',
-            danger: true,
+            title: 'New Scan Root',
             body: (
               <>
-                <Line>{current?.displayPath ?? mode.path}</Line>
-                <Confirm danger question='Remove this Scan Root?' />
+                <box flexDirection='row'>
+                  <text fg={COLORS.muted}>{'Path '}</text>
+                  <Input
+                    focused
+                    value={mode.path}
+                    onInput={(path) => setMode({ kind: 'form', path })}
+                    onSubmit={() =>
+                      void run(core.addScanRoot(mode.path), `Added Scan Root ${mode.path}`)
+                    }
+                  />
+                </box>
+                {completions.paths.map((path, index) => (
+                  <ListRow key={path} selected={index === completions.selected}>
+                    {path}
+                  </ListRow>
+                ))}
+                <Hints
+                  hints={[
+                    ['Tab', 'complete'],
+                    ['↑/↓', 'choose'],
+                    ['Enter', 'save'],
+                    ['Esc', 'cancel'],
+                  ]}
+                />
               </>
             ),
           }
-        : null
+        : mode.kind === 'confirm-delete'
+          ? {
+              title: 'Remove Scan Root',
+              danger: true,
+              body: (
+                <>
+                  <Line>{current?.displayPath ?? mode.path}</Line>
+                  <Confirm danger question='Remove this Scan Root?' />
+                </>
+              ),
+            }
+          : null
 
   const remoteScopeList =
     remoteScopes.length === 0 ? (
@@ -325,7 +327,6 @@ export function SettingsView({ core, onCapture, onConfigChange }: SettingsViewPr
     <Panes
       title='Scan Roots'
       onSizeChange={measurePanes}
-      dialog={dialog}
       popup={popup}
       detail={{ title: 'Remote Scopes', body: remoteScopeList }}
       footer={

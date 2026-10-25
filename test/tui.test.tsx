@@ -230,9 +230,10 @@ describe('TUI shell', () => {
 
     const tui = await openTui()
 
-    await tui.waitForFrame((f) => f.includes('Applied'))
+    const email = () =>
+      Bun.spawnSync(['git', 'config', 'user.email'], { cwd: repo, env: t.env }).stdout.toString()
 
-    expect(t.git(repo, 'config', 'user.email')).toBe('nico@personal.dev')
+    await tui.waitFor(() => email().trim() === 'nico@personal.dev')
     await tui.dispose()
   })
 
@@ -802,14 +803,12 @@ describe('Repos view', () => {
     await eventually(tui, (f) => f.includes('Suggested Scan Roots'))
     await press(tui, 'escape')
 
-    expect(await eventually(tui, (f) => f.includes('Add one in Settings'))).not.toContain(
-      'Suggested',
-    )
+    const emptyState = (f: string) => f.includes('Add one in Settings') && !f.includes('Suggested')
+
+    await eventually(tui, emptyState)
     await press(tui, '2')
     await press(tui, '1')
-    expect(await eventually(tui, (f) => f.includes('Add one in Settings'))).not.toContain(
-      'Suggested',
-    )
+    await eventually(tui, emptyState)
     expect(core().loadScanRoots()).toEqual([])
     await tui.dispose()
   })
@@ -1257,6 +1256,32 @@ describe('import of existing configuration', () => {
         .identities.map((identity) => identity.email),
     ).toEqual(['nico@personal.dev', 'nico@work.dev'])
     expect(t.git(repo, 'config', 'user.email')).toBe('nico@work.dev')
+    await tui.dispose()
+  })
+
+  test('a long import preview sums up the folders that do not fit and keeps its keys visible', async () => {
+    const folders = Array.from({ length: 25 }, (_, index) => `f${index}`)
+
+    t.write(
+      '.gitconfig',
+      [
+        '[user]\n\tname = Nico Personal\n\temail = nico@personal.dev',
+        ...folders.map(
+          (folder) => `[includeIf "gitdir:~/${folder}/"]\n\tpath = ~/.gitconfig-${folder}`,
+        ),
+        '',
+      ].join('\n'),
+    )
+
+    for (const folder of folders) {
+      t.write(`.gitconfig-${folder}`, `[user]\n\tname = Nico\n\temail = ${folder}@x.dev\n`)
+    }
+
+    const tui = await openTui()
+    const preview = await eventually(tui, (f) => f.includes('Import existing configuration'))
+
+    expect(preview).toMatch(/\.\.\.and \d+ more/)
+    expect(preview).toContain('Enter import')
     await tui.dispose()
   })
 
