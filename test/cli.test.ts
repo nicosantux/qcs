@@ -2,6 +2,7 @@ import { unlinkSync } from 'node:fs'
 
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
+import packageJson from '../package.json' with { type: 'json' }
 import { createCore } from '../src/core/index.ts'
 
 import { createTestHome, PERSONAL_DEFAULT_IDENTITIES, type TestHome } from './harness.ts'
@@ -118,6 +119,12 @@ email = "nico@work.dev"
 
       expect(code).toBe(0)
       expect(out).toContain('use <identity-id>')
+    }
+  })
+
+  test('prints the version for --version and -v', () => {
+    for (const flag of ['--version', '-v']) {
+      expect(qcs(t.home, flag)).toMatchObject({ code: 0, out: `${packageJson.version}\n` })
     }
   })
 })

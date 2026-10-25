@@ -2,6 +2,7 @@
 import { homedir } from 'node:os'
 import { resolve } from 'node:path'
 
+import packageJson from '../../package.json' with { type: 'json' }
 import { ConfigError, createCore } from '../core/index.ts'
 
 import { formatStatus, NOT_A_REPOSITORY_MESSAGE } from './status.ts'
@@ -17,6 +18,7 @@ Commands:
   use <identity-id>   assign an Identity to the current repository (Repo Scope)
   add [path]          register a directory as a Scan Root (default: the current directory)
   help, --help, -h    show this help
+  --version, -v       show the version
 
 The identity id is the key under [identities] in identities.toml, e.g. "work" for [identities.work].`
 
@@ -25,6 +27,12 @@ async function main(args: string[]): Promise<number> {
 
   if (command === 'help' || command === '--help' || command === '-h') {
     console.log(HELP)
+
+    return 0
+  }
+
+  if (command === '--version' || command === '-v') {
+    console.log(packageJson.version)
 
     return 0
   }

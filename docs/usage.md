@@ -9,6 +9,7 @@ qcs use <identity-id>     # assign an Identity to the current repository (Repo S
 qcs add [path]            # register a Scan Root (default: the current directory)
 qcs add "$(fd -t d . ~ | fzf)"  # pick it with fzf
 qcs --help
+qcs --version
 ```
 
 The identity id is the key under `[identities]` in [`identities.toml`](configuration.md#identitiestoml), e.g. `work` for `[identities.work]`.
