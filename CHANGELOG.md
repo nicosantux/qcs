@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/nicosantux/qcs/compare/v1.0.1...v1.1.0) (2026-10-25)
+
+
+### Features
+
+* **cli:** print the version with --version or -v ([#18](https://github.com/nicosantux/qcs/issues/18)) ([949a2de](https://github.com/nicosantux/qcs/commit/949a2de375ba9616bd7c6bca6f4e5172ed30575e))
+* **tui:** show the import and suggested scan roots dialogs as popups ([#17](https://github.com/nicosantux/qcs/issues/17)) ([80ef509](https://github.com/nicosantux/qcs/commit/80ef50966a7743d78c6dba2bf9b2f985c5c085f8))
+
 ## [1.0.1](https://github.com/nicosantux/qcs/compare/v1.0.0...v1.0.1) (2026-10-25)
 
 
