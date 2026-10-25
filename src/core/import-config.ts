@@ -115,9 +115,9 @@ function authorOf(entries: Entry[]): Author | null {
   return name && email ? { name, email } : null
 }
 
-/** A `gitdir:` condition that names one literal folder, ending in `/`. */
+/** A `gitdir:` condition that names one literal folder, ending in `/` or `/**` (git reads both the same). */
 function folderOf(environment: Environment, condition: string): string | null {
-  const pattern = /^gitdir(?:\/i)?:(.*\/)$/.exec(condition)?.[1]
+  const pattern = /^gitdir(?:\/i)?:(.*\/)(?:\*\*)?$/.exec(condition)?.[1]
 
   if (pattern === undefined || /[*?[\\]/.test(pattern)) return null
   const expanded = expandHome(pattern, environment.home)
@@ -158,7 +158,12 @@ function detect(environment: Environment, content: string, configPath: string): 
         : []
     })
 
-    const author = authorOf(includedEntries.filter(({ key }) => isAuthorKey(key)))
+    // An included file that sets only the email keeps the name set above it, and vice versa.
+    const author = authorOf([
+      ...authorLines.filter(({ line }) => line < section.start),
+      ...includedEntries.filter(({ key }) => isAuthorKey(key)),
+    ])
+
     const folder = folderOf(environment, section.subsection)
 
     if (folder !== null && author && paths.length === 1 && section.entries.length === 1) {

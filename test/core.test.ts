@@ -991,6 +991,42 @@ describe('import of existing configuration', () => {
     expect(await core().previewImport()).not.toBeNull()
   })
 
+  test('imports `/**` folder rules whose files set only the email, keeping the global name', async () => {
+    t.write(
+      '.gitconfig',
+      [
+        '[user]',
+        '\tname = Nico Personal',
+        '\temail = nico@personal.dev',
+        '[includeIf "gitdir:~/work/**"]',
+        '\tpath = ~/work/.gitconfig',
+        '[includeIf "gitdir:~/work/oss/**"]',
+        '\tpath = ~/work/oss/.gitconfig',
+        '',
+      ].join('\n'),
+    )
+    t.write('work/.gitconfig', '[user]\n\temail = nico@work.dev\n')
+    t.write('work/oss/.gitconfig', '[user]\n\temail = nico@oss.dev\n')
+
+    const repos = ['code/a', 'work/b', 'work/oss/c'].map((path) => t.makeRepo(path))
+    const before = repos.map(authorOf)
+
+    await core().importConfiguration()
+
+    expect(repos.map(authorOf)).toEqual(before)
+    expect(before).toEqual([
+      'Nico Personal <nico@personal.dev>',
+      'Nico Personal <nico@work.dev>',
+      'Nico Personal <nico@oss.dev>',
+    ])
+    expect(
+      core()
+        .loadFolderScopes()
+        .map((scope) => scope.displayPath),
+    ).toEqual(['~/work', '~/work/oss'])
+    expect(await Bun.file(t.path('.gitconfig')).text()).not.toContain('includeIf')
+  })
+
   test('rules it cannot import stay untouched and keep resolving as External Rules', async () => {
     t.write(
       '.gitconfig',
