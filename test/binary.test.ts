@@ -4,6 +4,7 @@ import { join } from 'node:path'
 
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 
+import packageJson from '../package.json' with { type: 'json' }
 import { createCore } from '../src/core/index.ts'
 
 import { createTestHome, PERSONAL_DEFAULT_IDENTITIES, type TestHome } from './harness.ts'
@@ -72,5 +73,9 @@ describe('compiled qcs binary', () => {
 
     expect(code).toBe(64)
     expect(err).toContain('unknown command')
+  })
+
+  test('prints the version it was built from', () => {
+    expect(qcs(t.home, '--version')).toMatchObject({ code: 0, out: `${packageJson.version}\n` })
   })
 })
