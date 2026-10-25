@@ -33,11 +33,19 @@ The same checks run on every pull request (see [Releasing](releasing.md)).
 
 Commits follow [Conventional Commits](https://www.conventionalcommits.org) and are checked by commitlint through a Husky hook.
 
+## Demo GIF
+
+`docs/demo.gif` is recorded with [VHS](https://github.com/charmbracelet/vhs) (`brew install vhs`) in a throwaway home with a fake user, so re-record it after visible TUI or CLI changes:
+
+```sh
+vhs scripts/demo/demo.tape
+```
+
 ## Project layout
 
 - `src/core`: identity config, Scope resolution, repository scanning and git config generation
 - `src/cli`: command entry point (`qcs`) and `status` output
 - `src/tui`: terminal UI built with OpenTUI and React
-- `scripts`: sandbox (`dev.ts`) and binary build (`build.ts`)
+- `scripts`: sandbox (`dev.ts`), binary build (`build.ts`) and demo recording (`demo/`)
 - `packaging/homebrew`: Homebrew formula template
 - `test`: core, CLI, TUI and compiled binary tests
