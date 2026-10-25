@@ -2,7 +2,7 @@
 class Qcs < Formula
   desc "Assign and inspect which git identity is used in each folder or repository"
   homepage "https://github.com/nicosantux/qcs"
-  version "1.0.0" # x-release-please-version
+  version "1.0.1" # x-release-please-version
 
   on_macos do
     on_arm do
