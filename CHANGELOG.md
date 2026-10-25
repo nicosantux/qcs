@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/nicosantux/qcs/compare/v1.0.0...v1.0.1) (2026-10-25)
+
+
+### Bug Fixes
+
+* **core:** import gitdir rules ending in /** or setting only the email ([#15](https://github.com/nicosantux/qcs/issues/15)) ([dc89e94](https://github.com/nicosantux/qcs/commit/dc89e94ef54b08daaab3a838e37b400aab09ba75))
+
 ## 1.0.0 (2026-10-24)
 
 
