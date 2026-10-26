@@ -14,6 +14,12 @@ With Homebrew (macOS, Linux):
 brew install nicosantux/tap/qcs
 ```
 
+With mise:
+
+```sh
+mise use -g github:nicosantux/qcs
+```
+
 With the install script, to `~/.local/bin`:
 
 ```sh
