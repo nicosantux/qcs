@@ -37,7 +37,7 @@ jobs:
           cd dist
           for dir in */; do
             target="${dir%/}"
-            tar -czf "qcs-${target}.tar.gz" -C "$target" qcs
+            tar -czf "qcs-${target}.tar.gz" --owner=0 --group=0 -C "$target" qcs
           done
           sha256sum qcs-*.tar.gz > SHA256SUMS
       - name: Upload to the release
