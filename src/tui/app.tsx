@@ -111,6 +111,8 @@ function loadKeybindings(core: Core): { bindings: Keybindings; error: string | n
 }
 
 export interface AppProps {
+  /** Resolves to a notice about a newer release, or null when there is none. */
+  checkForUpdate?: () => Promise<string | null>
   core: Core
   onQuit: () => void
 }
@@ -134,7 +136,7 @@ function hasMissingKeys(core: Core): boolean {
   }
 }
 
-export function App({ core, onQuit }: AppProps) {
+export function App({ checkForUpdate, core, onQuit }: AppProps) {
   const [offerMissingKeys, setOfferMissingKeys] = useState(() => hasMissingKeys(core))
   const offerDismissedRef = useRef(false)
   const importDismissedRef = useRef(false)
@@ -153,6 +155,12 @@ export function App({ core, onQuit }: AppProps) {
   useEffect(() => {
     core.apply().catch((error: Error) => setApplyError(error.message))
   }, [core])
+
+  const [updateNotice, setUpdateNotice] = useState<string | null>(null)
+
+  useEffect(() => {
+    void checkForUpdate?.().then(setUpdateNotice)
+  }, [checkForUpdate])
 
   const { width, height } = useTerminalDimensions()
   const splashFits = width >= ART_WIDTH + 2 && height >= ART_HEIGHT + SPLASH_EXTRA_ROWS + SHELL_ROWS
@@ -246,6 +254,7 @@ export function App({ core, onQuit }: AppProps) {
             <text fg={COLORS.error}>{`Error: ${keybindingsError} (using the default keys)`}</text>
           )}
           {applyError !== null && <text fg={COLORS.error}>{`Error: ${applyError}`}</text>}
+          {updateNotice !== null && !splash && <text fg={COLORS.accent}>{updateNotice}</text>}
         </box>
       </box>
     </KeybindingsProvider>

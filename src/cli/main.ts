@@ -1,4 +1,5 @@
 #!/usr/bin/env bun
+import { realpathSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { resolve } from 'node:path'
 
@@ -6,6 +7,7 @@ import packageJson from '../../package.json' with { type: 'json' }
 import { ConfigError, createCore } from '../core/index.ts'
 
 import { formatStatus, NOT_A_REPOSITORY_MESSAGE } from './status.ts'
+import { installationOf, update, updateNotice } from './update.ts'
 
 const HELP = `Usage: qcs [command]
 
@@ -17,10 +19,12 @@ Commands:
                       (exit 1 on an Unknown Identity, 2 outside a repository)
   use <identity-id>   assign an Identity to the current repository (Repo Scope)
   add [path]          register a directory as a Scan Root (default: the current directory)
+  update              update qcs to the latest release (installs made with install.sh or by hand)
   help, --help, -h    show this help
   --version, -v       show the version
 
-The identity id is the key under [identities] in identities.toml, e.g. "work" for [identities.work].`
+The identity id is the key under [identities] in identities.toml, e.g. "work" for [identities.work].
+Set QCS_NO_UPDATE_CHECK=1 to stop the TUI from checking for a new release.`
 
 async function main(args: string[]): Promise<number> {
   const [command] = args
@@ -37,14 +41,63 @@ async function main(args: string[]): Promise<number> {
     return 0
   }
 
+  const installation = installationOf(realpathSync(process.execPath), Bun.main)
+
+  if (command === 'update') {
+    if (installation.kind === 'source') {
+      console.error('qcs: running from source, update it with git pull')
+
+      return 1
+    }
+
+    if (installation.kind === 'managed') {
+      console.error(`qcs: installed by a package manager, ${installation.upgradeHint}`)
+
+      return 1
+    }
+
+    try {
+      const updated = await update({
+        binary: installation.binary,
+        current: packageJson.version,
+        fetch,
+        target: `${process.platform}-${process.arch}`,
+      })
+
+      console.log(
+        updated === null
+          ? `qcs ${packageJson.version} is up to date`
+          : `Updated qcs ${packageJson.version} -> ${updated}`,
+      )
+
+      return 0
+    } catch (error) {
+      const denied = (error as NodeJS.ErrnoException).code === 'EACCES'
+
+      console.error(
+        denied
+          ? `qcs: no permission to write ${installation.binary}, run "sudo qcs update"`
+          : `qcs: could not update: ${(error as Error).message}`,
+      )
+
+      return 1
+    }
+  }
+
   const core = createCore({ home: homedir(), env: process.env })
 
   if (command === undefined) {
     const { runTui } = await import('../tui/run.tsx')
 
-    await runTui(core)
+    const checkForUpdate =
+      installation.kind === 'source' || process.env.QCS_NO_UPDATE_CHECK
+        ? undefined
+        : () => updateNotice(installation, packageJson.version, fetch)
 
-    return 0
+    await runTui(core, checkForUpdate)
+
+    // A pending update check would otherwise hold the exit for up to its timeout.
+    process.exit(0)
   }
 
   if (command === 'status') {

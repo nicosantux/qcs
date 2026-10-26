@@ -5,10 +5,15 @@ import { createRoot } from '@opentui/react'
 
 import { App } from './app.tsx'
 
-export async function runTui(core: Core): Promise<void> {
+export async function runTui(
+  core: Core,
+  checkForUpdate?: () => Promise<string | null>,
+): Promise<void> {
   const renderer = await createCliRenderer({ exitOnCtrlC: true })
   const closed = new Promise<void>((resolve) => renderer.once('destroy', resolve))
 
-  createRoot(renderer).render(<App core={core} onQuit={() => renderer.destroy()} />)
+  createRoot(renderer).render(
+    <App core={core} checkForUpdate={checkForUpdate} onQuit={() => renderer.destroy()} />,
+  )
   await closed
 }

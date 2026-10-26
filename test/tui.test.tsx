@@ -194,6 +194,26 @@ describe('TUI shell', () => {
     await tui.dispose()
   })
 
+  test('shows the notice of a newer release in the footer once the splash is gone', async () => {
+    const tui = await testRender(
+      <App
+        checkForUpdate={() => Promise.resolve('qcs 9.0.0 is available: run "qcs update"')}
+        core={createCore({ home: t.home, env: t.env })}
+        onQuit={() => undefined}
+      />,
+      { width: 80, height: 40 },
+    )
+
+    await tui.renderOnce()
+
+    expect(
+      await eventually(tui, (f) => f.includes('█▀█ █ █ █ █▀▀') && f.includes('@@@@@@@@')),
+    ).not.toContain('qcs 9.0.0 is available')
+    await press(tui, '1')
+    await eventually(tui, (f) => f.includes('qcs 9.0.0 is available: run "qcs update"'))
+    await tui.dispose()
+  })
+
   test('shows the art beside the help only when both fit', async () => {
     const tui = await testRender(
       <App core={createCore({ home: t.home, env: t.env })} onQuit={() => undefined} />,

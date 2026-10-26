@@ -44,7 +44,7 @@ vhs scripts/demo/demo.tape
 ## Project layout
 
 - `src/core`: identity config, Scope resolution, repository scanning and git config generation
-- `src/cli`: command entry point (`qcs`) and `status` output
+- `src/cli`: command entry point (`qcs`), `status` output and `update`
 - `src/tui`: terminal UI built with OpenTUI and React
 - `scripts`: sandbox (`dev.ts`), binary build (`build.ts`) and demo recording (`demo/`)
 - `packaging/homebrew`: Homebrew formula template

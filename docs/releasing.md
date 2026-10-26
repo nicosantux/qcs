@@ -18,6 +18,8 @@ Releases are driven by [release-please](https://github.com/googleapis/release-pl
 3. `.github/workflows/release.yml` builds the four binaries and uploads `qcs-<os>-<arch>.tar.gz` and `SHA256SUMS` to the release.
 4. The same workflow fills the hashes into `packaging/homebrew/qcs.rb` (its version is bumped by the release PR) and pushes it to `Formula/` in the tap repository `nicosantux/homebrew-tap`.
 
+`install.sh`, `qcs update`, mise and the TUI update notice all read the latest GitHub Release, so they pick up a release as soon as its assets are uploaded. Keep the asset names `qcs-<os>-<arch>.tar.gz` and `SHA256SUMS`: they depend on them.
+
 Both release-please and the tap push use a `RELEASE_TOKEN` secret: a fine-grained personal access token with `Contents: write` and `Pull requests: write` on this repository and `Contents: write` on the tap. It must not be `GITHUB_TOKEN`, because PRs opened with that token do not trigger CI, so the release PR could never pass the required check.
 
 ## Building locally
