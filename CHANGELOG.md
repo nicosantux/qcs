@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/nicosantux/qcs/compare/v1.1.0...v1.2.0) (2026-10-26)
+
+
+### Features
+
+* add `qcs update` and a notice of new releases ([#22](https://github.com/nicosantux/qcs/issues/22)) ([cc78688](https://github.com/nicosantux/qcs/commit/cc78688ed6e6cd3152aca21763ad884697f43331))
+* add an install script ([#21](https://github.com/nicosantux/qcs/issues/21)) ([14fbcee](https://github.com/nicosantux/qcs/commit/14fbceeed385a0baecce3bdbd6c446b0bfea5f31))
+
 ## [1.1.0](https://github.com/nicosantux/qcs/compare/v1.0.1...v1.1.0) (2026-10-25)
 
 
