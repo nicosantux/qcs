@@ -48,4 +48,5 @@ vhs scripts/demo/demo.tape
 - `src/tui`: terminal UI built with OpenTUI and React
 - `scripts`: sandbox (`dev.ts`), binary build (`build.ts`) and demo recording (`demo/`)
 - `packaging/homebrew`: Homebrew formula template
+- `install.sh`: installer for the latest release (`curl ... | sh`)
 - `test`: core, CLI, TUI and compiled binary tests

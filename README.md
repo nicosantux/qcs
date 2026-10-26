@@ -8,8 +8,16 @@ Identities are applied through native git `includeIf` rules, so the right identi
 
 ## Install
 
+With Homebrew (macOS, Linux):
+
 ```sh
 brew install nicosantux/tap/qcs
+```
+
+With the install script, to `~/.local/bin`:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/nicosantux/qcs/main/install.sh | sh
 ```
 
 Or download `qcs-<os>-<arch>.tar.gz` (macOS or Linux, x64 or arm64) from the GitHub Releases page and put `qcs` on your `PATH`. The binary is self-contained and only needs git (2.36 or newer for Remote Scopes).
