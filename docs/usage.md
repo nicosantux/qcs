@@ -8,6 +8,7 @@ qcs status                # Effective Identity of the current repository and whe
 qcs use <identity-id>     # assign an Identity to the current repository (Repo Scope)
 qcs add [path]            # register a Scan Root (default: the current directory)
 qcs add "$(fd -t d . ~ | fzf)"  # pick it with fzf
+qcs update                # update to the latest release (script and manual installs)
 qcs --help
 qcs --version
 ```
@@ -15,6 +16,10 @@ qcs --version
 The identity id is the key under `[identities]` in [`identities.toml`](configuration.md#identitiestoml), e.g. `work` for `[identities.work]`.
 
 `qcs status` exits with `1` on an Unknown Identity and `2` outside a repository, so it can guard scripts and hooks.
+
+`qcs update` replaces the binary in place after checking it against the release's `SHA256SUMS`. Installs owned by Homebrew, mise or a system package manager are left to them, and `qcs update` says which command to run instead. Run it with `sudo` when the binary is in a directory you can't write to.
+
+The TUI checks GitHub for a newer release on start and shows it in the footer. Set `QCS_NO_UPDATE_CHECK=1` to turn the check off.
 
 ## TUI
 

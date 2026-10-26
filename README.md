@@ -28,6 +28,8 @@ curl -fsSL https://raw.githubusercontent.com/nicosantux/qcs/main/install.sh | sh
 
 Or download `qcs-<os>-<arch>.tar.gz` (macOS or Linux, x64 or arm64) from the GitHub Releases page and put `qcs` on your `PATH`. The binary is self-contained and only needs git (2.36 or newer for Remote Scopes).
 
+Update with `brew upgrade qcs`, `mise upgrade github:nicosantux/qcs`, or `qcs update` for the script and manual installs. The TUI shows when a new release is available.
+
 ## Quick start
 
 ```sh
