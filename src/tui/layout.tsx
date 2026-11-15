@@ -1,9 +1,8 @@
 import type { BoxRenderable, RGBA } from '@opentui/core'
-import type { InputProps } from '@opentui/react'
 
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
-import { useTerminalDimensions } from '@opentui/react'
+import { type InputProps, useTerminalDimensions } from '@opentui/react'
 
 import { BOLD, COLORS, SELECTED } from './theme.ts'
 

@@ -1,6 +1,5 @@
-import { unlinkSync } from 'node:fs'
-
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import { unlinkSync } from 'node:fs'
 
 import packageJson from '../package.json' with { type: 'json' }
 import { createCore } from '../src/core/index.ts'
