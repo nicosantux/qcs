@@ -1,15 +1,12 @@
-import type { IdentitiesConfig } from './config-store.ts'
-import type { FolderScope } from './machine-config.ts'
-
 import { readFileSync } from 'node:fs'
 import { basename, dirname, isAbsolute, resolve } from 'node:path'
 
-import { collapseHome } from './config-store.ts'
+import { type IdentitiesConfig, collapseHome } from './config-store.ts'
 import { fileExists } from './fs.ts'
 import { globalGitConfigPath } from './global-git-config.ts'
 import { parseIdentityInput, uniqueIdentityId } from './identities.ts'
 import { nextIdentityColor } from './identity-colors.ts'
-import { pathKey } from './machine-config.ts'
+import { type FolderScope, pathKey } from './machine-config.ts'
 import { expandHome, type Environment } from './paths.ts'
 
 interface Author {
@@ -68,7 +65,7 @@ function parseValue(raw: string): string {
   const value = raw.trim()
   const quoted = /^"((?:[^"\\]|\\.)*)"/.exec(value)
 
-  return quoted ? quoted[1]!.replaceAll(/\\(.)/g, '$1') : value.replace(/\s+[#;].*$/, '')
+  return quoted ? (quoted[1] ?? '').replaceAll(/\\(.)/g, '$1') : value.replace(/\s+[#;].*$/, '')
 }
 
 function parseSections(lines: string[]): Section[] {
@@ -79,7 +76,7 @@ function parseSections(lines: string[]): Section[] {
 
     if (header || text.trimStart().startsWith('[')) {
       sections.push({
-        name: header ? header[1]!.toLowerCase() : '?',
+        name: header?.[1]?.toLowerCase() ?? '?',
         subsection: header?.[2]?.replaceAll(/\\(.)/g, '$1') ?? null,
         start: line,
         end: line,
@@ -95,7 +92,9 @@ function parseSections(lines: string[]): Section[] {
     const entry = ENTRY.exec(text)
 
     if (entry) {
-      section.entries.push({ key: entry[1]!.toLowerCase(), value: parseValue(entry[2]!), line })
+      const [, key = '', raw = ''] = entry
+
+      section.entries.push({ key: key.toLowerCase(), value: parseValue(raw), line })
     }
 
     if (!IGNORABLE.test(text)) section.end = line

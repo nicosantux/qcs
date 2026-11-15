@@ -1,7 +1,8 @@
-import type { IdentitiesConfig, RemoteScope } from './config-store.ts'
 import type { Environment } from './paths.ts'
 
 import {
+  type IdentitiesConfig,
+  type RemoteScope,
   assertIdentityExists,
   ConfigError,
   loadRemoteScopes,
@@ -49,7 +50,7 @@ export async function suggestRemotePattern(
   const urls = stdout
     .split('\n')
     .filter(Boolean)
-    .map((line) => ({ key: line.split(' ')[0]!, url: line.slice(line.indexOf(' ') + 1) }))
+    .map((line) => ({ key: line.split(' ')[0] ?? '', url: line.slice(line.indexOf(' ') + 1) }))
 
   const url = (urls.find(({ key }) => key === 'remote.origin.url') ?? urls[0])?.url
 

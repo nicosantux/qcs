@@ -208,12 +208,13 @@ export function SettingsView({ core, onCapture, onConfigChange }: SettingsViewPr
 
     if (mode.kind === 'form') {
       const { paths, selected: chosen } = completions
+      const completion = paths[chosen]
 
       if (key.name === 'escape') {
         setError(null)
         enter({ kind: 'list' })
-      } else if (key.name === 'tab' && paths.length > 0) {
-        setMode({ kind: 'form', path: paths[chosen]! })
+      } else if (key.name === 'tab' && completion !== undefined) {
+        setMode({ kind: 'form', path: completion })
       } else if (key.name === 'down' || key.name === 'up') {
         const step = key.name === 'up' ? -1 : 1
 

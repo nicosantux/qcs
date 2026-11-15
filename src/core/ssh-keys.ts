@@ -148,7 +148,7 @@ export async function generateSshKey(
   }
 }
 
-const CLIPBOARD_COMMANDS =
+const CLIPBOARD_COMMANDS: [string, ...string[]][] =
   process.platform === 'darwin'
     ? [['pbcopy']]
     : [['wl-copy'], ['xclip', '-selection', 'clipboard', '-in']]
@@ -183,7 +183,7 @@ export async function copyPublicKey(environment: Environment, key: string): Prom
     // eslint-disable-next-line no-await-in-loop -- sequential on purpose: wl-copy fails on X11 sessions, where xclip works
     if ((await process.exited) === 0) return
 
-    failed ??= command[0]!
+    failed ??= command[0]
   }
 
   if (failed !== null) throw new ConfigError(`${failed} failed to copy the public key`)

@@ -1,5 +1,3 @@
-import type { Environment } from './paths.ts'
-
 import {
   collapseHome,
   ConfigError,
@@ -9,6 +7,7 @@ import {
   saveRemoteScopes,
   signingKeyOf,
   type IdentitiesConfig,
+  type Identity,
   type RemoteScope,
 } from './config-store.ts'
 import {
@@ -55,7 +54,7 @@ import {
   type ScanRoot,
 } from './machine-config.ts'
 import { findOrphanedAssignments, type OrphanedAssignment } from './orphans.ts'
-import { managedGitConfigPath } from './paths.ts'
+import { type Environment, managedGitConfigPath } from './paths.ts'
 import { suggestRemotePattern, withRemoteScope } from './remote-scopes.ts'
 import { withRepoScope } from './repo-scopes.ts'
 import { resolveEffectiveIdentity, type Resolution } from './resolver.ts'
@@ -279,7 +278,7 @@ export function createCore(environment: Environment): Core {
 
       if (replaced !== undefined && !replace) throw new AssignmentConflictError(replaced)
 
-      const scopes = [...others, moved.at(-1)!]
+      const scopes = [...others, ...moved.slice(-1)]
 
       if (repository) saveRepoScopes(environment, scopes)
       else saveFolderScopes(environment, scopes)
@@ -364,8 +363,11 @@ export function createCore(environment: Environment): Core {
         )
 
         return Map.groupBy(
-          repositories.filter(({ identity }) => identity !== null),
-          ({ identity }) => identity!.id,
+          repositories.filter(
+            (repository): repository is RepositoryNode & { identity: Identity } =>
+              repository.identity !== null,
+          ),
+          ({ identity }) => identity.id,
         )
       }),
     listSshKeys: () => listSshKeys(environment),

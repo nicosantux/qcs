@@ -89,7 +89,7 @@ function parseBinding(binding: string): Binding | null {
 
   const [, prefix = '', name = ''] = modifiers
   const has = (modifier: string) => prefix.includes(`${modifier}+`)
-  const single = [...name].length === 1 && /^\S$/u.test(name)
+  const single = /^\S$/u.test(name)
 
   if (!single && !NAMED_KEYS.has(name)) return null
   // An uppercase letter already means Shift.

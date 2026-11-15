@@ -19,7 +19,7 @@ export function globalGitConfigPath(environment: Environment): string {
 function includedPath(line: string): string | null {
   const match = /^\s*path\s*=\s*(.*?)\s*$/.exec(line)
 
-  return match ? match[1]!.replace(/^"(.*)"$/, '$1') : null
+  return match?.[1]?.replace(/^"(.*)"$/, '$1') ?? null
 }
 
 function hasInclude(content: string, managedPath: string): boolean {
@@ -121,7 +121,7 @@ export function hasIdentitySettingsAfterInclude(
     const header = /^\s*\[\s*([A-Za-z0-9.-]+)/.exec(line)
 
     if (header) {
-      section = header[1]!.toLowerCase()
+      section = header[1]?.toLowerCase() ?? ''
 
       return false
     }

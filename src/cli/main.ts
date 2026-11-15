@@ -143,7 +143,7 @@ async function main(args: string[]): Promise<number> {
     const target = path === undefined ? process.cwd() : /^\s*$|^~/.test(path) ? path : resolve(path)
 
     await core.addScanRoot(target)
-    console.log(`Added Scan Root ${core.loadScanRoots().at(-1)!.displayPath}`)
+    console.log(`Added Scan Root ${core.loadScanRoots().at(-1)?.displayPath ?? target}`)
 
     return 0
   }

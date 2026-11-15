@@ -1,17 +1,3 @@
-import type {
-  Core,
-  FolderScope,
-  Identity,
-  ImportPlan,
-  OrphanedAssignment,
-  RemoteScope,
-  RepositoryNode,
-  ScanResult,
-  ScopeChange,
-  SshKeyStatus,
-  SuggestedScanRoot,
-  TreeNode,
-} from '../core/index.ts'
 import type { RGBA } from '@opentui/core'
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
@@ -21,6 +7,18 @@ import { basename } from 'node:path'
 import { useKeyboard } from '@opentui/react'
 
 import {
+  type Core,
+  type FolderScope,
+  type Identity,
+  type ImportPlan,
+  type OrphanedAssignment,
+  type RemoteScope,
+  type RepositoryNode,
+  type ScanResult,
+  type ScopeChange,
+  type SshKeyStatus,
+  type SuggestedScanRoot,
+  type TreeNode,
   AssignmentConflictError,
   realPathOrSelf,
   repositoriesIn,
@@ -388,10 +386,10 @@ export function ReposView({
         setError(null)
         onConfigChange()
       })
-      .catch((failure: Error) => {
+      .catch((failure: unknown) => {
         setImportOffer(null)
         setOffer([])
-        setError(failure.message)
+        setError((failure as Error).message)
       })
       .finally(() => {
         inFlight.current = false
@@ -706,8 +704,9 @@ export function ReposView({
         setMode({ ...mode, selected: Math.min(mode.selected + 1, mode.identities.length - 1) })
       } else if (isUp(key)) setMode({ ...mode, selected: Math.max(mode.selected - 1, 0) })
       else if (key.name === 'return') {
-        const identity = mode.identities[mode.selected]!
+        const identity = mode.identities[mode.selected]
 
+        if (identity === undefined) return
         if (mode.pattern !== null) void assignRemote(mode.pattern, identity)
         else if (mode.repository) void assignRepository(mode.path, identity)
         else void startConfirmation(mode.path, identity)
@@ -749,7 +748,7 @@ export function ReposView({
     } else if (matchesKey(key, repos.remote) && current && !current.expandable) {
       void startRemoteScope(current.path)
     } else if (matchesKey(key, repos.unassign) && current && scopes.has(current.path)) {
-      if (scopes.get(current.path)!.repository) void assignRepository(current.path, null)
+      if (scopes.get(current.path)?.repository) void assignRepository(current.path, null)
       else void startConfirmation(current.path, null)
     } else if (isDown(key)) {
       setSelected((previous) => Math.max(Math.min(previous + 1, rows.length - 1), 0))
@@ -994,26 +993,26 @@ export function ReposView({
         <Line>Repos view: no Scan Roots yet. Add one in Settings (3).</Line>
       ) : (
         <>
-          {rows.slice(top, top + paneRows).map((row, offset) => (
-            <ListRow key={row.path} selected={top + offset === index}>
-              <Tint color={row.color}>{row.cells ? row.text.padEnd(nameWidth) : row.text}</Tint>
-              {row.cells && (
-                <Tint
-                  color={row.cells.color}
-                >{`  ${row.cells.identity.padEnd(identityWidth)}`}</Tint>
-              )}
-              {row.cells && <Muted>{`  ${row.cells.origin}`}</Muted>}
-              {row.cells && row.cells.keyAlert !== '' && (
-                <Tint color={COLORS.error}>{row.cells.keyAlert}</Tint>
-              )}
-              {scopes.has(row.path) && row.expandable && (
-                <Tint
-                  color={scopes.get(row.path)!.color}
-                >{`  [${scopes.get(row.path)!.label}]`}</Tint>
-              )}
-              {row.note !== '' && <Muted>{row.note}</Muted>}
-            </ListRow>
-          ))}
+          {rows.slice(top, top + paneRows).map((row, offset) => {
+            const scope = row.expandable ? scopes.get(row.path) : undefined
+
+            return (
+              <ListRow key={row.path} selected={top + offset === index}>
+                <Tint color={row.color}>{row.cells ? row.text.padEnd(nameWidth) : row.text}</Tint>
+                {row.cells && (
+                  <Tint
+                    color={row.cells.color}
+                  >{`  ${row.cells.identity.padEnd(identityWidth)}`}</Tint>
+                )}
+                {row.cells && <Muted>{`  ${row.cells.origin}`}</Muted>}
+                {row.cells && row.cells.keyAlert !== '' && (
+                  <Tint color={COLORS.error}>{row.cells.keyAlert}</Tint>
+                )}
+                {scope && <Tint color={scope.color}>{`  [${scope.label}]`}</Tint>}
+                {row.note !== '' && <Muted>{row.note}</Muted>}
+              </ListRow>
+            )
+          })}
           {rows.length === 0 && filtering && <text fg={COLORS.muted}>No repositories match.</text>}
         </>
       )}
@@ -1059,6 +1058,8 @@ function RowDetail({ remoteScopes, row, rows, scopes }: RowDetailProps) {
   }
 
   const cells = repositoryCells(node)
+  const source = originSource(node, row, rows, scopes, remoteScopes)
+  const signingKey = node.identity === null ? null : signingKeyOf(node.identity)
 
   return (
     <>
@@ -1072,9 +1073,7 @@ function RowDetail({ remoteScopes, row, rows, scopes }: RowDetailProps) {
       {node.identity !== null && (
         <>
           <Field label='Origin'>{ORIGIN_LABELS[node.classification]}</Field>
-          {originSource(node, row, rows, scopes, remoteScopes) !== null && (
-            <Field label=''>{originSource(node, row, rows, scopes, remoteScopes)!}</Field>
-          )}
+          {source !== null && <Field label=''>{source}</Field>}
           <Field label='SSH key'>
             {node.sshKey === 'used' ? (
               basename(node.identity.sshKey ?? '')
@@ -1084,10 +1083,10 @@ function RowDetail({ remoteScopes, row, rows, scopes }: RowDetailProps) {
               <span fg={COLORS.error}>missing</span>
             )}
           </Field>
-          {signingKeyOf(node.identity) !== null && (
+          {signingKey !== null && (
             <Field label='Signing'>
               {node.signingKey === 'used' ? (
-                basename(signingKeyOf(node.identity)!)
+                basename(signingKey)
               ) : node.signingKey === 'none' ? (
                 'not in effect'
               ) : (

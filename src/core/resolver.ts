@@ -12,7 +12,12 @@ import {
 import { sshCommandFor, type SshKeyStatus } from './ssh-keys.ts'
 
 export type Origin =
-  'default' | 'external-rule' | 'folder-scope' | 'none' | 'remote-scope' | 'repo-scope'
+  | 'default'
+  | 'external-rule'
+  | 'folder-scope'
+  | 'none'
+  | 'remote-scope'
+  | 'repo-scope'
 
 export type Resolution =
   | {
@@ -115,18 +120,18 @@ async function pickSharedEmail(
   repository: string,
   candidates: Identity[],
   name: string | undefined,
-): Promise<Identity> {
+): Promise<Identity | undefined> {
   const sameName = candidates.filter((candidate) => candidate.name === name)
   const pool = sameName.length > 0 ? sameName : candidates
 
-  if (pool.length === 1) return pool[0]!
+  if (pool.length === 1) return pool[0]
 
   const sshCommand = (await readConfigValue(environment, repository, 'core.sshCommand'))?.value
 
   const expected = (key: string | null) =>
     key !== null && fileExists(key) ? sshCommandFor(key) : undefined
 
-  return pool.find(({ sshKey }) => expected(sshKey) === sshCommand) ?? pool[0]!
+  return pool.find(({ sshKey }) => expected(sshKey) === sshCommand) ?? pool[0]
 }
 
 export async function resolveEffectiveIdentity(
