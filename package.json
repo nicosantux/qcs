@@ -2,20 +2,20 @@
   "name": "qcs",
   "version": "1.2.0",
   "private": true,
-  "type": "module",
   "bin": {
     "qcs": "src/cli/main.ts"
   },
+  "type": "module",
   "scripts": {
     "start": "bun run src/cli/main.ts",
     "dev": "bun run scripts/dev.ts",
     "dev:reset": "bun run scripts/dev.ts reset",
     "test": "bun test --parallel",
     "typecheck": "tsc --noEmit",
-    "format": "prettier . --check",
-    "format:fix": "prettier . --write",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "format": "oxfmt --check",
+    "format:fix": "oxfmt",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
     "prepare": "husky"
   },
   "dependencies": {
@@ -27,20 +27,17 @@
   "devDependencies": {
     "@commitlint/cli": "21.2.4",
     "@commitlint/config-conventional": "21.2.4",
-    "@eslint/js": "10.0.1",
+    "@santux/oxc-config": "1.0.0",
+    "@stylistic/eslint-plugin": "5.10.0",
     "@types/bun": "1.4.4",
     "@types/react": "19.3.0",
     "@typescript/native": "npm:typescript@7.0.2",
-    "eslint": "9",
-    "eslint-config-prettier": "10.1.8",
     "eslint-plugin-check-file": "3.3.2",
-    "eslint-plugin-import": "2.32.0",
-    "eslint-plugin-react-hooks": "7.1.1",
-    "eslint-plugin-unicorn": "79.0.0",
     "globals": "17.13.0",
     "husky": "9.1.7",
-    "prettier": "3.9.10",
-    "typescript": "npm:@typescript/typescript6@6.0.2",
-    "typescript-eslint": "8.72.1"
+    "oxfmt": "0.78.0",
+    "oxlint": "1.93.0",
+    "oxlint-tsgolint": "7.0.2007",
+    "typescript": "npm:@typescript/typescript6@6.0.2"
   }
 }
