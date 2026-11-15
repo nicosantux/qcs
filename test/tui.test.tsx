@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { chmodSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 
 import { createTestRenderer } from '@opentui/core/testing'
 import { createRoot } from '@opentui/react'
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { createCore } from '../src/core/index.ts'
 import { App } from '../src/tui/app.tsx'
@@ -305,9 +305,9 @@ describe('Identities view', () => {
 
     const [personal, work] = core().load().identities
 
-    expect(personal!.sshKey).toBe(t.path('.ssh/id_personal'))
-    expect(personal!.signingKey).toBe(t.path('.ssh/id_personal_signing'))
-    expect(work!.sshKey).toBe(t.path('.ssh/id_personal'))
+    expect(personal?.sshKey).toBe(t.path('.ssh/id_personal'))
+    expect(personal?.signingKey).toBe(t.path('.ssh/id_personal_signing'))
+    expect(work?.sshKey).toBe(t.path('.ssh/id_personal'))
     expect(core().missingSshKeys()).toEqual([])
     expect(core().missingSigningKeys()).toEqual([])
     await tui.dispose()
@@ -431,7 +431,7 @@ describe('Identities view', () => {
     await press(tui, 'return')
 
     await tui.waitForFrame((f) => f.includes('key: id_work'))
-    expect(core().load().identities[0]!.sshKey).toBe(key)
+    expect(core().load().identities[0]?.sshKey).toBe(key)
     expect(t.git(repo, 'config', 'core.sshCommand')).toContain(key)
 
     rmSync(key)
@@ -457,12 +457,12 @@ describe('Identities view', () => {
     await press(tui, 'return')
 
     await tui.waitForFrame((f) => f.includes('Key name'))
-    expect(core().load().identities[0]!.sshKey).toBeNull()
+    expect(core().load().identities[0]?.sshKey).toBeNull()
     await type(tui, 'id_work')
     await press(tui, 'return')
     await press(tui, 'return')
     await eventually(tui, (f) => f.includes('key: id_work'))
-    expect(core().load().identities[0]!.sshKey).toBe(t.path('.ssh/id_work'))
+    expect(core().load().identities[0]?.sshKey).toBe(t.path('.ssh/id_work'))
     await tui.dispose()
   })
 
@@ -614,7 +614,7 @@ describe('Identities view', () => {
     const frame = await eventually(tui, (f) => f.includes('key: id_work  signs'))
 
     expect(frame).toContain('as a signing key')
-    expect(core().load().identities[0]!.signingKey).toBe('ssh_key')
+    expect(core().load().identities[0]?.signingKey).toBe('ssh_key')
 
     await press(tui, 's')
     expect(await tui.waitForFrame((f) => f.includes('SSH keys in ~/.ssh'))).toMatch(
@@ -923,9 +923,9 @@ describe('Repos view', () => {
       const { lines } = tui.captureSpans()
       const line = lines.find((l) => l.spans.some((span) => span.text.includes('alpha')))
 
-      return line!.spans
-        .find((span) => span.text.includes('Personal'))!
-        .fg.toInts()
+      return line?.spans
+        .find((span) => span.text.includes('Personal'))
+        ?.fg.toInts()
         .join()
     }
 
