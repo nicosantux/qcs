@@ -1,8 +1,7 @@
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { type Fetch, installationOf, isNewer, update, updateNotice } from '../src/cli/update.ts'
 
@@ -134,7 +133,9 @@ describe('update', () => {
       target: 'linux-x64',
     })
 
-    expect(await updating.then(String, (error: Error) => error.message)).toContain('checksum')
+    expect(await updating.then(String, (error: unknown) => (error as Error).message)).toContain(
+      'checksum',
+    )
     expect(readFileSync(binary, 'utf8')).toBe('old binary')
   })
 
@@ -148,7 +149,7 @@ describe('update', () => {
       target: 'linux-riscv64',
     })
 
-    expect(await updating.then(String, (error: Error) => error.message)).toContain(
+    expect(await updating.then(String, (error: unknown) => (error as Error).message)).toContain(
       'no build for linux-riscv64',
     )
     expect(readFileSync(binary, 'utf8')).toBe('old binary')

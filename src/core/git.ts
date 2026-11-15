@@ -30,7 +30,7 @@ export async function runGit(
   return { exitCode, stdout: stdout.trim(), stderr: stderr.trim() }
 }
 
-const MINIMUM_REMOTE_SCOPE_VERSION = [2, 36]
+const MINIMUM_REMOTE_SCOPE_VERSION = [2, 36] as const
 
 /** Why Remote Scopes cannot work with the installed git (`hasconfig:` needs 2.36), or null when they can. */
 export async function remoteScopesUnavailableReason(
@@ -43,7 +43,7 @@ export async function remoteScopesUnavailableReason(
   const [major, minor] = [Number(match[1]), Number(match[2])]
   const [requiredMajor, requiredMinor] = MINIMUM_REMOTE_SCOPE_VERSION
 
-  if (major > requiredMajor! || (major === requiredMajor && minor >= requiredMinor!)) return null
+  if (major > requiredMajor || (major === requiredMajor && minor >= requiredMinor)) return null
 
   return `Remote Scopes need git ${requiredMajor}.${requiredMinor} or newer (found ${match[0]})`
 }

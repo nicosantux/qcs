@@ -61,7 +61,7 @@ export function isNewer(candidate: string, current: string): boolean {
 
   const differs = a.findIndex((part, index) => part !== b[index])
 
-  return differs >= 0 && a[differs]! > b[differs]!
+  return differs >= 0 && (a[differs] ?? 0) > (b[differs] ?? 0)
 }
 
 /** The footer notice of the TUI, or null when there is nothing newer or GitHub can't be reached. */

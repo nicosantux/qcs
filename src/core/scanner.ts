@@ -1,14 +1,11 @@
-import type { Identity } from './config-store.ts'
-import type { ScanRoot } from './machine-config.ts'
-import type { Environment } from './paths.ts'
 import type { SshKeyStatus } from './ssh-keys.ts'
 
 import { readdir } from 'node:fs/promises'
 import { isAbsolute, join } from 'node:path'
 
-import { collapseHome } from './config-store.ts'
-import { DEFAULT_MAX_DEPTH, overlaps } from './machine-config.ts'
-import { expandHome } from './paths.ts'
+import { type Identity, collapseHome } from './config-store.ts'
+import { type ScanRoot, DEFAULT_MAX_DEPTH, overlaps } from './machine-config.ts'
+import { type Environment, expandHome } from './paths.ts'
 import { resolveEffectiveIdentity, type Origin } from './resolver.ts'
 
 export type Classification =

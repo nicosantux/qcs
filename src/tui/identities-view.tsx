@@ -1,19 +1,20 @@
-import type {
-  Core,
-  IdentitiesConfig,
-  Identity,
-  IdentityInput,
-  KeyPurpose,
-  RepositoryNode,
-} from '../core/index.ts'
-
 import { useEffect, useRef, useState } from 'react'
 
 import { basename } from 'node:path'
 
 import { useKeyboard } from '@opentui/react'
 
-import { DELETE_DEFAULT_IDENTITY_MESSAGE, SIGN_WITH_SSH_KEY, signingKeyOf } from '../core/index.ts'
+import {
+  type Core,
+  type IdentitiesConfig,
+  type Identity,
+  type IdentityInput,
+  type KeyPurpose,
+  type RepositoryNode,
+  DELETE_DEFAULT_IDENTITY_MESSAGE,
+  SIGN_WITH_SSH_KEY,
+  signingKeyOf,
+} from '../core/index.ts'
 
 import { identityColor } from './identity-color.ts'
 import { matchesKey, useKeybindings, type Keybindings } from './keybindings.ts'
@@ -55,7 +56,7 @@ type KeyChoice = string | typeof NEW_KEY | null
 function stepChoice(options: readonly KeyChoice[], current: KeyChoice, step: number): KeyChoice {
   const index = Math.max(options.indexOf(current), 0)
 
-  return options[(index + step + options.length) % options.length]!
+  return options[(index + step + options.length) % options.length] ?? null
 }
 
 /** Signing choices: none, the SSH key when there is one, a new key, and the current dedicated key. */
@@ -197,9 +198,11 @@ function missingKeyFiles({ config, missingKeys, missingSigningKeys }: LoadedConf
 
   return config.identities
     .flatMap(({ id, signingKey, sshKey }): MissingKey[] => [
-      ...(missingKeys.includes(id) ? [{ id, path: sshKey!, purpose: 'ssh' as const }] : []),
-      ...(missingSigningKeys.includes(id) && signingKey !== SIGN_WITH_SSH_KEY
-        ? [{ id, path: signingKey!, purpose: 'signing' as const }]
+      ...(missingKeys.includes(id) && sshKey !== null
+        ? [{ id, path: sshKey, purpose: 'ssh' as const }]
+        : []),
+      ...(missingSigningKeys.includes(id) && signingKey !== null && signingKey !== SIGN_WITH_SSH_KEY
+        ? [{ id, path: signingKey, purpose: 'signing' as const }]
         : []),
     ])
     .filter(({ path }) => !seen.has(path) && seen.add(path))
@@ -512,7 +515,10 @@ export function IdentitiesView({
       ) {
         setMode({
           ...mode,
-          values: { ...mode.values, name: nameSuggestion(config, mode.values.name)! },
+          values: {
+            ...mode.values,
+            name: nameSuggestion(config, mode.values.name) ?? mode.values.name,
+          },
         })
       } else if (key.name === 'tab' || key.name === 'down' || key.name === 'up') {
         const step = key.shift || key.name === 'up' ? -1 : 1
@@ -867,7 +873,7 @@ function KeyList({ bindings, config, confirm, keys, rows, selected }: KeyListPro
 
         return (
           <ListRow key={key} selected={first + offset === selected}>
-            {names[first + offset]!.padEnd(nameWidth)}
+            {(names[first + offset] ?? '').padEnd(nameWidth)}
             {users.length === 0 ? (
               <Tint color={COLORS.warning}>{'  unused'}</Tint>
             ) : (
@@ -961,7 +967,9 @@ function IdentityList({
   return (
     <>
       {config.identities.slice(first, first + visible).map((identity, offset) => {
-        const tag = tags[first + offset]!
+        const tag = tags[first + offset]
+
+        if (!tag) return null
 
         return (
           <ListRow key={identity.id} selected={first + offset === selected}>
@@ -1021,7 +1029,7 @@ function IdentityDetail({
               : 'same as SSH key'}
         {missingSigningKey && <span fg={COLORS.error}>{'  missing'}</span>}
       </Field>
-      <Field label='Assigned'>{assignments.length === 0 ? '(none)' : assignments[0]!.text}</Field>
+      <Field label='Assigned'>{assignments[0]?.text ?? '(none)'}</Field>
       {assignments.slice(1).map(({ text }) => (
         <Field key={text} label=''>
           {text}

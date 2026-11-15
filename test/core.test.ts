@@ -1,7 +1,7 @@
+import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
+import assert from 'node:assert'
 import { chmodSync, lstatSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
-
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test'
 
 import { isCaseInsensitiveFileSystem } from '../src/core/fs.ts'
 import { gitdirCondition } from '../src/core/generator.ts'
@@ -269,7 +269,7 @@ describe('Identities management', () => {
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   const work = { label: 'Work', name: 'Nico Work', email: 'nico@work.dev' }
@@ -357,7 +357,7 @@ describe('Identities management', () => {
 
     expect(saved).toContain('ssh_key = "~/.ssh/personal"')
     expect(saved).toContain('foo = "bar"')
-    expect(core.load().identities[0]!.sshKey).toBe(`${t.home}/.ssh/personal`)
+    expect(core.load().identities[0]?.sshKey).toBe(`${t.home}/.ssh/personal`)
   })
 })
 
@@ -365,7 +365,7 @@ describe('Scan Roots', () => {
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   test('are stored in machine.toml with ~ paths and loaded back expanded', async () => {
@@ -537,11 +537,13 @@ describe('scan', () => {
 
     const [result] = await core.scan()
 
-    expect(result!.missing).toBe(false)
-    expect(names(result!.children)).toEqual(['a', 'group'])
-    expect(result!.children[0]).toMatchObject({ kind: 'repository', path: t.path('code/a') })
-    expect(result!.children[1]).toMatchObject({ kind: 'folder', path: t.path('code/group') })
-    expect(names((result!.children[1] as { children: { name: string }[] }).children)).toEqual(['b'])
+    assert(result)
+
+    expect(result.missing).toBe(false)
+    expect(names(result.children)).toEqual(['a', 'group'])
+    expect(result.children[0]).toMatchObject({ kind: 'repository', path: t.path('code/a') })
+    expect(result.children[1]).toMatchObject({ kind: 'folder', path: t.path('code/group') })
+    expect(names((result.children[1] as { children: { name: string }[] }).children)).toEqual(['b'])
   })
 
   test('respects the maximum depth', async () => {
@@ -554,11 +556,13 @@ describe('scan', () => {
 
     const [result] = await core.scan()
 
-    const folder = result!.children.find((node) => node.name === 'x') as {
+    assert(result)
+
+    const folder = result.children.find((node) => node.name === 'x') as {
       children: { name: string }[]
     }
 
-    expect(names(result!.children)).toEqual(['one', 'x'])
+    expect(names(result.children)).toEqual(['one', 'x'])
     expect(names(folder.children)).toEqual(['two'])
   })
 
@@ -575,7 +579,9 @@ describe('scan', () => {
 
     const [result] = await core.scan()
 
-    expect(names(result!.children)).toEqual(['linked', 'linked-seed'])
+    assert(result)
+
+    expect(names(result.children)).toEqual(['linked', 'linked-seed'])
   })
 
   test('classifies each repository as Default Identity, External Rule or Unknown Identity', async () => {
@@ -592,7 +598,9 @@ describe('scan', () => {
     await core.addScanRoot('~/code', 2)
 
     const [result] = await core.scan()
-    const byName = Object.fromEntries(result!.children.map((node) => [node.name, node]))
+
+    assert(result)
+    const byName = Object.fromEntries(result.children.map((node) => [node.name, node]))
 
     expect(byName.plain).toMatchObject({
       classification: 'default-identity',
@@ -617,7 +625,9 @@ describe('scan', () => {
     await core.addScanRoot('~/code', 2)
 
     const [result] = await core.scan()
-    const byName = Object.fromEntries(result!.children.map((node) => [node.name, node]))
+
+    assert(result)
+    const byName = Object.fromEntries(result.children.map((node) => [node.name, node]))
 
     expect(byName.broken).toMatchObject({ classification: 'unknown-identity', unreadable: true })
     expect(byName.fine).toMatchObject({ unreadable: false })
@@ -631,6 +641,8 @@ describe('scan', () => {
     rmSync(t.path('code'), { recursive: true })
 
     const [result] = await core.scan()
+
+    assert(result)
 
     expect(result).toMatchObject({ missing: true, children: [] })
   })
@@ -654,7 +666,7 @@ email = "nico@client.dev"
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   test('every repository inside the folder, at any depth, uses the Identity', async () => {
@@ -829,7 +841,9 @@ email = "nico@client.dev"
 
     const [result] = await core.scan()
 
-    expect(result!.children).toMatchObject([{ name: 'a', classification: 'folder-scope' }])
+    assert(result)
+
+    expect(result.children).toMatchObject([{ name: 'a', classification: 'folder-scope' }])
   })
 
   test('deleting an Identity with Assignments is blocked and lists them, unless they are removed too', async () => {
@@ -902,7 +916,7 @@ describe('import of existing configuration', () => {
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   function writeDeveloperSetup() {
@@ -951,7 +965,7 @@ describe('import of existing configuration', () => {
       'nico@personal.dev',
       'nico@work.dev',
     ])
-    expect(defaultIdentityId).toBe(identities[0]!.id)
+    expect(defaultIdentityId).toBe(identities[0]?.id ?? null)
     expect(
       core()
         .loadFolderScopes()
@@ -964,7 +978,8 @@ describe('import of existing configuration', () => {
     expect(content).not.toContain('nico@personal.dev')
     expect(content).toContain('editor = vim')
     expect(content).toContain('signingkey = ABC123')
-    expect(t.git(repos[1]!, 'config', '--show-origin', 'user.email')).toContain(t.configDir)
+    assert(repos[1])
+    expect(t.git(repos[1], 'config', '--show-origin', 'user.email')).toContain(t.configDir)
   })
 
   test('the preview lists everything and changes nothing; the import takes a backup first', async () => {
@@ -979,7 +994,8 @@ describe('import of existing configuration', () => {
 
     const { backupPath } = await core().importConfiguration()
 
-    expect(await Bun.file(backupPath!).text()).toBe(original)
+    assert(backupPath)
+    expect(await Bun.file(backupPath).text()).toBe(original)
     expect(await core().previewImport()).toBeNull()
   })
 
@@ -1066,7 +1082,8 @@ describe('import of existing configuration', () => {
     expect(content).not.toContain('gitdir:~/first/')
     expect(content).toContain('gitdir:~/second/')
     expect(content).toContain('gitdir:~/ssh/')
-    expect(await core().resolve(repos[0]!)).toMatchObject({ origin: 'external-rule' })
+    assert(repos[0])
+    expect(await core().resolve(repos[0])).toMatchObject({ origin: 'external-rule' })
     expect(
       core()
         .loadFolderScopes()
@@ -1134,7 +1151,7 @@ email = "nico@client.dev"
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   const commit = (repo: string) =>
@@ -1251,7 +1268,9 @@ email = "nico@client.dev"
 
     const [result] = await core().scan()
 
-    expect(result!.children).toMatchObject([{ name: 'a', classification: 'repo-scope' }])
+    assert(result)
+
+    expect(result.children).toMatchObject([{ name: 'a', classification: 'repo-scope' }])
   })
 
   test('never writes to the repository-local git config', async () => {
@@ -1311,7 +1330,7 @@ email = "nico@client.dev"
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   const makeRepoWithRemote = (relativePath: string, url: string) => {
@@ -1454,7 +1473,9 @@ email = "nico@client.dev"
 
     const [result] = await core().scan()
 
-    expect(result!.children).toMatchObject([{ name: 'a', classification: 'remote-scope' }])
+    assert(result)
+
+    expect(result.children).toMatchObject([{ name: 'a', classification: 'remote-scope' }])
   })
 
   test('suggests a pattern covering the owner for SSH, scp-like and HTTPS remotes', async () => {
@@ -1626,10 +1647,10 @@ describe('SSH keys', () => {
     expect(await core.resolve(repo)).toMatchObject({ sshKey: 'used' })
 
     await core.editIdentity('work', { ...work, name: 'Nico W' })
-    expect(core.load().identities[0]!.sshKey).toBe(key)
+    expect(core.load().identities[0]?.sshKey).toBe(key)
 
     await core.editIdentity('work', { ...work, sshKey: null })
-    expect(core.load().identities[0]!.sshKey).toBeNull()
+    expect(core.load().identities[0]?.sshKey).toBeNull()
     expect(await core.resolve(repo)).toMatchObject({ sshKey: 'none' })
   })
 
@@ -1643,12 +1664,14 @@ describe('SSH keys', () => {
     await core.addScanRoot(t.path('code'))
     const [root] = await core.scan()
 
-    expect(root!.children).toMatchObject([{ name: 'a', sshKey: 'used' }])
+    assert(root)
+
+    expect(root.children).toMatchObject([{ name: 'a', sshKey: 'used' }])
     rmSync(key)
-    expect((await core.scan())[0]!.children).toMatchObject([{ sshKey: 'stale' }])
+    expect((await core.scan())[0]?.children).toMatchObject([{ sshKey: 'stale' }])
 
     await core.apply()
-    expect((await core.scan())[0]!.children).toMatchObject([{ sshKey: 'missing' }])
+    expect((await core.scan())[0]?.children).toMatchObject([{ sshKey: 'missing' }])
   })
 
   test('deletes an unused key with its public key, never one an Identity uses', async () => {
@@ -1658,11 +1681,13 @@ describe('SSH keys', () => {
 
     await core.createIdentity({ ...work, sshKey: used })
 
-    expect(await core.deleteSshKey(used).catch((error: Error) => error.message)).toContain(
-      '"Work" uses ~/.ssh/id_work',
-    )
     expect(
-      await core.deleteSshKey(t.path('.ssh/config')).catch((error: Error) => error.message),
+      await core.deleteSshKey(used).catch((error: unknown) => (error as Error).message),
+    ).toContain('"Work" uses ~/.ssh/id_work')
+    expect(
+      await core
+        .deleteSshKey(t.path('.ssh/config'))
+        .catch((error: unknown) => (error as Error).message),
     ).toContain('is not an SSH key')
 
     await core.deleteSshKey(unused)
@@ -1692,7 +1717,7 @@ describe('SSH keys', () => {
 
     await core.editIdentity('work', { ...work, sshKey: null })
 
-    expect(core.load().identities[0]!.signingKey).toBe(SIGN_WITH_SSH_KEY)
+    expect(core.load().identities[0]?.signingKey).toBe(SIGN_WITH_SSH_KEY)
     expect(await core.resolve(repo)).toMatchObject({ signingKey: 'none' })
     expect(
       Bun.spawnSync(['git', 'config', 'commit.gpgsign'], { cwd: repo, env: t.env }).exitCode,
@@ -1732,9 +1757,9 @@ describe('SSH keys', () => {
 
     await core.createIdentity({ ...work, signingKey: signing })
 
-    expect(await core.deleteSshKey(signing).catch((error: Error) => error.message)).toContain(
-      '"Work" uses ~/.ssh/id_work_signing',
-    )
+    expect(
+      await core.deleteSshKey(signing).catch((error: unknown) => (error as Error).message),
+    ).toContain('"Work" uses ~/.ssh/id_work_signing')
     expect(core.listSshKeys()).toEqual([signing])
   })
 
@@ -1742,7 +1767,7 @@ describe('SSH keys', () => {
     const rejection = (promise: Promise<unknown>) =>
       promise.then(
         () => null,
-        (error: Error) => error.message,
+        (error: unknown) => (error as Error).message,
       )
 
     const CLIPBOARD_COMMAND = process.platform === 'darwin' ? 'pbcopy' : 'wl-copy'
@@ -1769,7 +1794,7 @@ describe('SSH keys', () => {
 
       const key = t.path('.ssh/id_ed25519_work')
 
-      expect(core.load().identities[0]!.sshKey).toBe(key)
+      expect(core.load().identities[0]?.sshKey).toBe(key)
       expect(await Bun.file(`${key}.pub`).text()).toMatch(/^ssh-ed25519 \S+ nico@work\.dev\n$/)
       expect(core.listSshKeys()).toEqual([key])
       expect(t.git(repo, 'config', 'core.sshCommand')).toContain(key)
@@ -1800,7 +1825,7 @@ describe('SSH keys', () => {
       await core.generateSshKey('work')
 
       expect(await Bun.file(taken).text()).toBe('PRIVATE')
-      expect(core.load().identities[0]!.sshKey).toBe(t.path('.ssh/id_ed25519_work-3'))
+      expect(core.load().identities[0]?.sshKey).toBe(t.path('.ssh/id_ed25519_work-3'))
       expect(core.listSshKeys()).toHaveLength(3)
     })
 
@@ -1810,7 +1835,7 @@ describe('SSH keys', () => {
       await core.createIdentity(work)
       await core.generateSshKey('work', '', 'github_work')
 
-      expect(core.load().identities[0]!.sshKey).toBe(t.path('.ssh/github_work'))
+      expect(core.load().identities[0]?.sshKey).toBe(t.path('.ssh/github_work'))
       expect(await Bun.file(t.path('.ssh/github_work.pub')).exists()).toBe(true)
     })
 
@@ -1832,7 +1857,7 @@ describe('SSH keys', () => {
         )
       }
 
-      expect(core.load().identities[0]!.sshKey).toBeNull()
+      expect(core.load().identities[0]?.sshKey).toBeNull()
     })
 
     test('protects the key with the passphrase', async () => {
@@ -1858,7 +1883,7 @@ describe('SSH keys', () => {
       chmodSync(t.path('.ssh'), 0o500)
 
       expect(await rejection(core.generateSshKey('work'))).toMatch(/ssh-keygen failed: .+/)
-      expect(core.load().identities[0]!.sshKey).toBeNull()
+      expect(core.load().identities[0]?.sshKey).toBeNull()
       expect(await rejection(core.generateSshKey('missing'))).toContain('does not exist')
     })
 
@@ -1933,7 +1958,7 @@ describe('diagnostics', () => {
   const rejection = (promise: Promise<unknown>) =>
     promise.then(
       () => null,
-      (error: Error) => error.message,
+      (error: unknown) => (error as Error).message,
     )
 
   async function withScopes() {
@@ -2113,7 +2138,7 @@ describe('diagnostics', () => {
     const byIdentity = await core().repositoriesByIdentity()
 
     expect([...byIdentity.keys()]).toEqual(['personal'])
-    expect(byIdentity.get('personal')!.map(({ name }) => name)).toEqual(['a', 'b'])
+    expect(byIdentity.get('personal')?.map(({ name }) => name)).toEqual(['a', 'b'])
   })
 })
 
@@ -2135,7 +2160,7 @@ describe('Identity colors', () => {
     expect(core.load().identities.map(({ color }) => color)).toEqual([a, c])
 
     await core.createIdentity(identity('d'))
-    expect(core.load().identities.at(-1)!.color).toBe(b)
+    expect(core.load().identities.at(-1)?.color).toBe(b)
   })
 
   test('gives distinct slots to Identities saved without one, and stores them on the next save', async () => {

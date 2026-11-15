@@ -1,8 +1,7 @@
-import type { FolderScope } from './machine-config.ts'
 import type { Environment } from './paths.ts'
 
 import { fileExists } from './fs.ts'
-import { loadFolderScopes, loadRepoScopes } from './machine-config.ts'
+import { type FolderScope, loadFolderScopes, loadRepoScopes } from './machine-config.ts'
 
 export interface OrphanedAssignment extends FolderScope {
   /** True for a Repo Scope, false for a Folder Scope. */

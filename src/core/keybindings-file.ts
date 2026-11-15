@@ -1,9 +1,7 @@
-import type { Environment } from './paths.ts'
-
 import { join } from 'node:path'
 
 import { readTomlFile } from './config-store.ts'
-import { configDirectory } from './paths.ts'
+import { type Environment, configDirectory } from './paths.ts'
 
 export function keybindingsFilePath(environment: Environment): string {
   return join(configDirectory(environment), 'keybindings.toml')

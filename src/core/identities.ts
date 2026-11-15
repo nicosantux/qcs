@@ -1,6 +1,4 @@
-import type { IdentitiesConfig, Identity } from './config-store.ts'
-
-import { ConfigError } from './config-store.ts'
+import { type IdentitiesConfig, type Identity, ConfigError } from './config-store.ts'
 import { nextIdentityColor } from './identity-colors.ts'
 
 export interface IdentityInput {

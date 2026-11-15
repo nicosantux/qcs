@@ -153,7 +153,7 @@ export function App({ checkForUpdate, core, onQuit }: AppProps) {
   const [{ bindings, error: keybindingsError }] = useState(() => loadKeybindings(core))
 
   useEffect(() => {
-    core.apply().catch((error: Error) => setApplyError(error.message))
+    core.apply().catch((error: unknown) => setApplyError((error as Error).message))
   }, [core])
 
   const [updateNotice, setUpdateNotice] = useState<string | null>(null)
@@ -169,7 +169,7 @@ export function App({ checkForUpdate, core, onQuit }: AppProps) {
   // Once the splash is hidden for lack of room it stays hidden, so growing the terminal never remounts the views.
   if (!splashFits && !splashDismissed) setSplashDismissed(true)
 
-  const view = VIEWS[viewIndex]!
+  const view = VIEWS[viewIndex] ?? VIEWS[0]
   const byDefault = defaultIdentity(core)
 
   useKeyboard((key) => {

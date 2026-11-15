@@ -1,8 +1,7 @@
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 import { mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, test } from 'bun:test'
 
 import packageJson from '../package.json' with { type: 'json' }
 import { createCore } from '../src/core/index.ts'

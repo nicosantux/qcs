@@ -1,10 +1,14 @@
-import type { IdentitiesConfig, Identity, RemoteScope } from './config-store.ts'
 import type { FolderScope, RepoScope } from './machine-config.ts'
 
 import { readdirSync, readFileSync, rmSync } from 'node:fs'
 import { basename, join } from 'node:path'
 
-import { signingKeyOf } from './config-store.ts'
+import {
+  type IdentitiesConfig,
+  type Identity,
+  type RemoteScope,
+  signingKeyOf,
+} from './config-store.ts'
 import {
   fileExists,
   gitDirectoryOf,
@@ -159,7 +163,10 @@ function writeScopeFiles<T extends { identityId: string }>(
   const written = new Set<string>()
 
   for (const scope of scopes) {
-    const identity = config.identities.find((candidate) => candidate.id === scope.identityId)!
+    const identity = config.identities.find((candidate) => candidate.id === scope.identityId)
+
+    if (!identity) throw new Error(`Identity "${scope.identityId}" does not exist`)
+
     const file = filePath(scope)
 
     writeFileAtomic(file, identityFileContent(identity))

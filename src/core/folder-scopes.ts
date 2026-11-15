@@ -1,20 +1,24 @@
-import type { IdentitiesConfig, Identity } from './config-store.ts'
-import type { FolderScope } from './machine-config.ts'
 import type { Environment } from './paths.ts'
-import type { RepositoryNode, TreeNode } from './scanner.ts'
 
 import { statSync } from 'node:fs'
 
-import { assertIdentityExists, ConfigError, loadIdentitiesConfig } from './config-store.ts'
+import {
+  type IdentitiesConfig,
+  type Identity,
+  assertIdentityExists,
+  ConfigError,
+  loadIdentitiesConfig,
+} from './config-store.ts'
 import { gitDirectoryOf, isInside, realPathOrSelf } from './fs.ts'
 import {
+  type FolderScope,
   loadFolderScopes,
   loadScanRoots,
   normalizePath,
   pathKey,
   type ScanRoot,
 } from './machine-config.ts'
-import { scanRoots } from './scanner.ts'
+import { type RepositoryNode, type TreeNode, scanRoots } from './scanner.ts'
 
 export interface ScopeChange {
   current: Identity | null

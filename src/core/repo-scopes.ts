@@ -1,13 +1,11 @@
-import type { IdentitiesConfig } from './config-store.ts'
-import type { RepoScope } from './machine-config.ts'
 import type { Environment } from './paths.ts'
 
 import { statSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { assertIdentityExists, ConfigError } from './config-store.ts'
+import { type IdentitiesConfig, assertIdentityExists, ConfigError } from './config-store.ts'
 import { realPathOrSelf } from './fs.ts'
-import { loadRepoScopes, normalizePath, pathKey } from './machine-config.ts'
+import { type RepoScope, loadRepoScopes, normalizePath, pathKey } from './machine-config.ts'
 
 type ScopeRef = Pick<RepoScope, 'identityId' | 'path'>
 

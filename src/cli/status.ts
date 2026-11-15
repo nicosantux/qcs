@@ -1,6 +1,4 @@
-import type { Origin, Resolution } from '../core/index.ts'
-
-import { signingKeyOf } from '../core/index.ts'
+import { type Origin, type Resolution, signingKeyOf } from '../core/index.ts'
 
 type KnownResolution = Extract<Resolution, { status: 'known' }>
 

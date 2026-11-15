@@ -23,7 +23,7 @@ export function fileExists(path: string): boolean {
 
 /** Detects it by checking whether the same path with swapped letter case resolves to the same place. */
 export function isCaseInsensitiveFileSystem(directory: string): boolean {
-  const swapped = [...directory]
+  const swapped = Array.from(directory)
     .map((char) => (char === char.toLowerCase() ? char.toUpperCase() : char.toLowerCase()))
     .join('')
 
